@@ -43,8 +43,9 @@ function Cell () {
 
 }
 
-function gameController(playerOneName = "Player One", playerTwoName = "Player Two") {
+function gameController(playerOneName, playerTwoName) {
     const board = gameBoard();
+    let gameOver = false;
 
     const players = [
         {
@@ -64,7 +65,6 @@ function gameController(playerOneName = "Player One", playerTwoName = "Player Tw
     };
 
     const getActivePlayer = () => activePlayer;
-    let gameOver = false;
 
     const printNewRound = () => {
         board.printBoard();
@@ -101,15 +101,21 @@ function gameController(playerOneName = "Player One", playerTwoName = "Player Tw
         return false;
      }
 
+     const checkDraw = () => {
+        return board.getBoard().every(row => row.every(cell => cell.getValue() !== null));
+     }
+
      const playRound = (row,column) => {
         if (board.getToken(row,column,getActivePlayer().token)) {
             if(checkWinner()) {
                 gameOver = true;
-                //alert(`${getActivePlayer.name} wins`);
-                //updateScreen();
-                return;
+                alert(`${getActivePlayer().name} wins`);
+            } else if (checkDraw()){
+                gameOver = true;
+                setTimeout(() => alert("It's a draw"));
+            } else {
+                switchPlayerTurn();
             }
-            switchPlayerTurn();
         } 
     };
 
@@ -122,7 +128,9 @@ function gameController(playerOneName = "Player One", playerTwoName = "Player Tw
 }
 
 function screenController () {
-    let game = gameController();
+    const playerOneName = prompt("Player 1 enter your name: ");
+    const playerTwoName = prompt("Player 2 enter your name: ");
+    let game = gameController(playerOneName,playerTwoName);
     const playerTurnDiv = document.getElementById("turn");
     const boardDiv = document.getElementById("board");
     const playButton = document.getElementById("play");
@@ -162,8 +170,9 @@ function screenController () {
     boardDiv.addEventListener("click", clickHandlerBoard);
 
     playButton.addEventListener("click", () => {
-       game = gameController();
+        game = gameController();
         updateScreen();
+        game
     });
 
     updateScreen();
